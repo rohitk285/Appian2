@@ -117,7 +117,7 @@ def upload_details():
 
         # Map document type to Couchbase collection
         collection_map = {
-            "Aadhaar Card": "aadhar",
+            "Aadhaar Card": "aadhaar",
             "PAN Card": "pan",
             "Credit Card": "creditcard",
             "Cheque": "cheque"
