@@ -6,8 +6,9 @@
     "outDir": "./build",
     "rootDir": ".",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowJs": true
   },
-  "include": ["*.ts", "routes/**/*.ts", "db/**/*.ts", "interfaces/**/*.ts"],
+  "include": ["*.ts", "routes/**/*.ts", "db/**/*.ts", "interfaces/**/*.ts", "utils/**/*.js"],
   "exclude": ["node_modules", "build"]
 }

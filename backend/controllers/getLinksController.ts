@@ -28,7 +28,7 @@ export const getLinks = async (req: Request): Promise<{status: number, body: any
             return {status: 500, body: "No documents found"};
 
         const documentTypes: string[] = docs.rows[0].document_type;
-        console.log(documentTypes);
+
         //defining type for reponse variable to be an array of {documents:...., link:.....}
         let response: {document: string, link: string}[] = [];
 
@@ -52,7 +52,6 @@ export const getLinks = async (req: Request): Promise<{status: number, body: any
                 case "Cheque":
                     const query3 = `SELECT fileLink from \`${bucketName}\`.\`${scopeName}\`.\`${cheque}\`
                         WHERE name_hash=$hashedName`;
-                    console.log(hashedName);
                     const chequeLink = await cluster.query(query3, {parameters:{hashedName}});
                     if(chequeLink.rows.length>0)
                         response.push({ document: "Cheque", link: chequeLink.rows[0].fileLink });
@@ -68,7 +67,7 @@ export const getLinks = async (req: Request): Promise<{status: number, body: any
                     break;
             }
         }
-        console.log(response);
+
         if(response.length === 0)
             return {status: 404, body: { message: "No document links found" }}; //No matching records found
 
