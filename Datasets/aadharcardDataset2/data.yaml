@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 8
+names: ['aadharNumber', 'address', 'city', 'dob', 'gender', 'name', 'pincode', 'state']
+
+roboflow:
+  workspace: zac
+  project: annotation-xsy5d
+  version: 1
+  license: BY-NC-SA 4.0
+  url: https://universe.roboflow.com/zac/annotation-xsy5d/dataset/1

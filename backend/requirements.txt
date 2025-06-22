@@ -1,0 +1,13 @@
+Flask==2.3.2
+flask-cors==3.0.10
+requests==2.31.0
+pymongo[srv]==4.3.3
+python-dotenv==1.0.0
+google-api-python-client==2.99.0
+google-auth==2.21.0
+cryptography==41.0.3
+
+PyMuPDF==1.22.5         # for fitz (PyMuPDF)
+pdf2image==1.16.3       # for convert_from_bytes
+Pillow==10.2.0          # PIL for image handling
+together==0.2.10        # (or latest version of Together SDK)

@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 29
+names: ['Aadhar_Card_Backside', 'Aadhar_Card_Frontside', 'Aadharnumber', 'DOB', 'Debit_or_Credit_Card', 'Emblemlogo', 'Fake', 'Gender', 'Goisymbol', 'Name', 'Original', 'PAN_Card', 'Photocopy', 'QR Code', 'aadharNumber', 'address', 'back', 'card_number', 'city', 'copy', 'exp_date', 'front_side', 'holder_name', 'panHolder_CO', 'panHolder_DOB', 'panHolder_Name', 'panHolder_Number', 'pincode', 'state']
+
+roboflow:
+  workspace: t-g-chavda
+  project: ...-fhv8y-7vsye
+  version: 6
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/t-g-chavda/...-fhv8y-7vsye/dataset/6
