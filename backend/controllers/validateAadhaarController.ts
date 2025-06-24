@@ -10,10 +10,8 @@ export const validateAadhaar = async (req: Request): Promise<{status: number, bo
     }
 
     // check for verhoeff check sum
-    if(cleanAadhaarNumber && cleanAadhaarNumber.length === 12 && validateVerhoeff(cleanAadhaarNumber)){
+    if(cleanAadhaarNumber && cleanAadhaarNumber.length === 12 && validateVerhoeff(cleanAadhaarNumber))
         return {status: 200, body:{message: "Aadhaar Number is valid."}};
-    }
-    else{
+    else
         return {status: 400, body:{error: "Invalid Aadhaar Number."}};
-    }
 };
