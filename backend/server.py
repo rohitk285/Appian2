@@ -8,6 +8,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from io import BytesIO
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 from datetime import datetime
 from couchbase.cluster import Cluster
@@ -51,11 +52,15 @@ def hash_name(name):
 def encrypt_name_aes(plaintext_name):
     key = bytes.fromhex(ENCRYPTION_KEY)
     iv = os.urandom(16)
+
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
-    pad_len = 16 - (len(plaintext_name.encode()) % 16)
-    padded_name = plaintext_name.encode() + bytes([pad_len]) * pad_len
-    encrypted = encryptor.update(padded_name) + encryptor.finalize()
+
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(plaintext_name.encode()) + padder.finalize()
+
+    encrypted = encryptor.update(padded_data) + encryptor.finalize()
+
     return {
         "iv": iv.hex(),
         "ciphertext": encrypted.hex()

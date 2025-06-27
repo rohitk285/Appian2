@@ -7,27 +7,29 @@ export interface EncryptedData {
   ciphertext: string;
 }
 
-export function encryptAES(plaintextName: string): EncryptedData {
+export function encryptAES(plaintext: string): EncryptedData {
   const keyHex = process.env.ENCRYPTION_KEY;
   if (!keyHex) {
     throw new Error("ENCRYPTION_KEY not set in environment variables");
   }
 
   const key = Buffer.from(keyHex, "hex");
-  const iv = crypto.randomBytes(16);
-
-  const blockSize = 16;
-  const buffer = Buffer.from(plaintextName, "utf8");
-  const padLen = blockSize - (buffer.length % blockSize);
-  const padded = Buffer.concat([buffer, Buffer.alloc(padLen, padLen)]);
+  const iv = crypto.randomBytes(16); // Always 16 bytes for AES-CBC
 
   const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
-  const encrypted = Buffer.concat([cipher.update(padded), cipher.final()]);
+  const encrypted = Buffer.concat([
+    cipher.update(plaintext, "utf8"),
+    cipher.final()
+  ]);
 
   return {
     iv: iv.toString("hex"),
     ciphertext: encrypted.toString("hex"),
   };
+}
+
+export function hashName(name: string): string {
+  return crypto.createHash("sha256").update(name).digest("hex");
 }
 
 export function decryptAES(encryptedObj: EncryptedData): string {
@@ -41,15 +43,8 @@ export function decryptAES(encryptedObj: EncryptedData): string {
   const encryptedText = Buffer.from(encryptedObj.ciphertext, "hex");
 
   const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-  const decryptedPadded = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+  const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
 
-  // Remove PKCS#7 padding
-  const padLen = decryptedPadded[decryptedPadded.length - 1];
-  const decrypted = decryptedPadded.slice(0, decryptedPadded.length - padLen);
-
+  // Convert directly to UTF-8 (works if encryption used PKCS7 padding)
   return decrypted.toString("utf8");
-}
-
-export function hashName(name: string): string {
-  return crypto.createHash("sha256").update(name).digest("hex");
 }

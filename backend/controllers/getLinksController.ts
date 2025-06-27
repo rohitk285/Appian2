@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { getCluster } from "../db/couchbase.js";
-import { decryptAES, EncryptedData, hashName } from "../utils/encryptionUtils.js";
+import { decryptAES, EncryptedData } from "../utils/encryptionUtils.js";
 import { QueryScanConsistency } from "couchbase";
 
 const bucketName = "appian";
