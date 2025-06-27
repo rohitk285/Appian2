@@ -1,10 +1,9 @@
 export interface CreditCard{
-    name: {
+    name: string;
+    fileLink: {
         iv: string;
         ciphertext: string;
     };
-    nameHash: string;
-    fileLink: string;
     createdAt?: string;
     updatedAt?: string;
 }

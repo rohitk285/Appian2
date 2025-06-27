@@ -7,6 +7,7 @@ import pushDetailsHandler from "./routes/pushDetailsHandler.js";
 import validateAadhaarHandler from "./routes/validateAadhaarHandler.js";
 import getUserDetailsHandler from "./routes/getUserDetailsHandler.js";
 import getLinksHandler from "./routes/getLinksHandler.js";
+import getDocumentsHandler from "./routes/getDocumentsHandler.js";
 
 dotenv.config();
 const app = express();
@@ -20,6 +21,7 @@ app.use("/pushDetails", pushDetailsHandler);
 app.use("/validateAadhaar", validateAadhaarHandler);
 app.use("/getUserDetails", getUserDetailsHandler);
 app.use("/getLinks", getLinksHandler);
+app.use("/getDocuments", getDocumentsHandler);
 
 app.listen(3000, () => {
   console.log("Express server running on http://localhost:3000");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -9,43 +9,79 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  TextField,
+  Modal,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import { DocumentScanner } from "@mui/icons-material";
+import axios from "axios";
 
 const RetrievalPageDoc = () => {
-  const users = [
-    { name: "Rohan Bakshi", dob: "1987-11-09", uploadedOn: "29/09/2024" },
-    { name: "Rohini Deshpande", dob: "2001-07-17", uploadedOn: "29/09/2024" },
-    { name: "Rohit Kumar", dob: "1995-12-12", uploadedOn: "28/09/2024" },
-    { name: "Yousaf M", dob: "1975-05-14", uploadedOn: "28/09/2024" },
-    { name: "Rohaan Acharya", dob: "1992-06-24", uploadedOn: "02/12/2024" },
-    { name: "Rohandeep Reddy", dob: "1997-07-06", uploadedOn: "12/09/2024" },
-    { name: "Manoj Reddy", dob: "1998-09-09", uploadedOn: "12/10/2024" },
-    { name: "Aditya Bakshi", dob: "1988-12-30", uploadedOn: "02/12/2024" },
-    { name: "Amyra Pandey", dob: "1999-07-10", uploadedOn: "01/11/2024" },
-    { name: "Alapati Raju", dob: "1985-11-11", uploadedOn: "02/11/2024" },
-    { name: "Govindan Narasimha", dob: "1990-08-09", uploadedOn: "01/11/2024" },
-    { name: "Lakshmi Narayanan", dob: "1985-09-08", uploadedOn: "02/11/2024" },
-  ];
-
   const [selectedDocument, setSelectedDocument] = useState("");
+  const [docQuery, setDocQuery] = useState("");
+  const [searchName, setSearchName] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const handleDocumentChange = (e) => {
-    const documentType = e.target.value;
-    setSelectedDocument(documentType);
-
-    const updatedResults = users.map((user) => ({
-      ...user,
-      document: `${user.name} ${documentType}`,
-    }));
-    setFilteredResults(updatedResults);
+    switch (e.target.value) {
+      case "Aadhaar Card":
+        setDocQuery("aadhaar");
+        break;
+      case "PAN Card":
+        setDocQuery("pan");
+        break;
+      case "Credit Card":
+        setDocQuery("creditcard");
+        break;  
+      case "Cheque":
+        setDocQuery("cheque");
+        break;
+      default:
+        setDocQuery("");
+        break;
+    }
+    setSelectedDocument(e.target.value);
+    setSearchName(""); // resetting search name when document type changes
   };
 
-  const handleSubmit = () => {
-    alert("Documents submitted successfully!");
+  const handleNameChange = (e) => {
+    setSearchName(e.target.value);
   };
+
+  const handleCardClick = (user) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  useEffect(() => {
+    const fetchFilteredData = async () => {
+      if (!selectedDocument || !searchName) {
+        setFilteredResults([]);
+        return;
+      }
+
+      try {
+        const response = await axios.get("http://localhost:3000/getDocuments", {
+          params: {
+            name: searchName,
+            documentType: docQuery,
+          },
+        });
+        setFilteredResults(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchFilteredData();
+  }, [selectedDocument, searchName]);
 
   return (
     <>
@@ -55,25 +91,25 @@ const RetrievalPageDoc = () => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          backgroundColor: "#FFFFFF", // White background
+          backgroundColor: "#FFFFFF",
           padding: 4,
           marginTop: "64px",
         }}
       >
-        {/* Black Box Surrounding Input */}
+        {/* Filter Input Box */}
         <Box
           sx={{
-            backgroundColor: "#000", // Black background for the box
+            backgroundColor: "#000",
             padding: 2,
-            maxWidth: "350px",
-            maxHeight: "150px",
+            maxWidth: "500px",
             borderRadius: "8px",
             display: "flex",
             alignItems: "center",
             marginBottom: 4,
+            gap: 2,
           }}
         >
-          <FormControl sx={{ width: "200px", marginRight: 2 }}>
+          <FormControl sx={{ width: "200px" }}>
             <InputLabel sx={{ color: "#FFFFFF" }}>Document Type</InputLabel>
             <Select
               value={selectedDocument}
@@ -86,32 +122,33 @@ const RetrievalPageDoc = () => {
                 },
               }}
             >
-              <MenuItem value="Aadhar card">Aadhar card</MenuItem>
-              <MenuItem value="PAN card">PAN card</MenuItem>
-              <MenuItem value="Driving License">Driving License</MenuItem>
-              <MenuItem value="Passport">Passport</MenuItem>
-              <MenuItem value="Voter Card">Voter Card</MenuItem>
+              <MenuItem value="Aadhaar Card">Aadhaar Card</MenuItem>
+              <MenuItem value="PAN Card">PAN Card</MenuItem>
+              <MenuItem value="Credit Card">Credit Card</MenuItem>
+              <MenuItem value="Cheque">Cheque</MenuItem>
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
+
+          <TextField
+            label="Name"
+            variant="filled"
+            value={searchName}
+            onChange={handleNameChange}
             sx={{
-              padding: "8px 16px",
-              fontWeight: "bold",
-              borderRadius: "30px"
+              input: { color: "#FFF" },
+              label: { color: "#FFF" },
+              backgroundColor: "#333",
+              borderRadius: "4px",
+              width: "200px",
             }}
-          >
-            Submit
-          </Button>
+          />
         </Box>
 
-        {/* Display Results in Grid Format */}
+        {/* Results Grid */}
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
             gap: 2,
           }}
         >
@@ -119,42 +156,43 @@ const RetrievalPageDoc = () => {
             filteredResults.map((user, index) => (
               <Card
                 key={index}
+                onClick={() => handleCardClick(user)}
                 sx={{
                   padding: 2,
-                  backgroundColor: "#E65100", // Slightly darker orange background
-                  color: "#FFFFFF", // White text
+                  backgroundColor: "#E65100",
+                  color: "#FFFFFF",
                   borderRadius: "8px",
                   boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                  position: "relative", // Required for positioning the icon
+                  position: "relative",
                   transition: "transform 0.3s ease, background-color 0.3s ease, color 0.3s ease",
+                  cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: "#F5F5F5", // Light gray background on hover
-                    color: "#000000", // Black text on hover
-                    transform: "scale(1.05)", // Slightly larger size
+                    backgroundColor: "#F5F5F5",
+                    color: "#000000",
+                    transform: "scale(1.05)",
                   },
                 }}
               >
                 <CardContent>
                   <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "Merriweather" }}>
-                    {user.document}
+                    {user.name}
                   </Typography>
-                  <Typography variant="body2" sx={{fontFamily: "Kanit"}}>
-                    Date of Birth: {user.dob}
+                  <Typography variant="body2" sx={{ fontFamily: "Kanit" }}>
+                    Document Type: {user.document_type}
                   </Typography>
-                  <Typography variant="body2" sx={{fontFamily: "Kanit"}}>
-                    Uploaded on: {user.uploadedOn}
+                  <Typography variant="body2" sx={{ fontFamily: "Kanit" }}>
+                    Uploaded At: {new Date(user.createdAt).toLocaleDateString()}
                   </Typography>
                 </CardContent>
 
-                {/* Document Icon */}
                 <Box
                   sx={{
                     position: "absolute",
-                    bottom: "8px", // Adjust to position relative to the card
-                    right: "8px", // Adjust to position relative to the card
+                    bottom: "8px",
+                    right: "8px",
                     color: "#FFFFFF",
                     "&:hover": {
-                      color: "#000000", // Change color on hover
+                      color: "#000000",
                     },
                   }}
                 >
@@ -164,11 +202,58 @@ const RetrievalPageDoc = () => {
             ))
           ) : (
             <Typography variant="body1" sx={{ color: "#000000" }}>
-              No results found. Please select a document.
+              No results found. Please select a document and type a name.
             </Typography>
           )}
         </Box>
       </Box>
+
+      {/* Modal for file details */}
+      <Modal open={modalOpen} onClose={handleModalClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            backgroundColor: "#fff",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          {selectedUser && (
+            <>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Document Details
+              </Typography>
+              <Typography variant="body1">
+                <strong>Name:</strong> {selectedUser.name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Uploaded At:</strong> {new Date(selectedUser.createdAt).toLocaleDateString()}
+              </Typography>
+              <Typography variant="body1">
+                <strong>File Link:</strong>{" "}
+                <a
+                  href={selectedUser.fileLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#1976d2" }}
+                >
+                  View File
+                </a>
+              </Typography>
+              <Box sx={{ textAlign: "right", mt: 3 }}>
+                <Button variant="contained" onClick={handleModalClose}>
+                  Close
+                </Button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Modal>
     </>
   );
 };

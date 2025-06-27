@@ -111,9 +111,9 @@ def upload_details():
         if "Name" not in named_entities:
             return jsonify({"error": "Name is required in named_entities."}), 400
 
-        name_hash = hash_name(named_entities["Name"])
-        encrypted_name = encrypt_name_aes(named_entities["Name"])
+        name = named_entities["Name"]
         file_link = file_drive_links['file_0']
+        encrypted_file_link = encrypt_name_aes(file_link)
 
         # Map document type to Couchbase collection
         collection_map = {
@@ -141,11 +141,10 @@ def upload_details():
 
         # 3. Store in Couchbase
         collection = scope.collection(collection_name)
-        doc_id = f"{collection_name}::{name_hash}"
+        doc_id = f"{collection_name}::{name}"
         doc_body = {
-            "name": encrypted_name,
-            "name_hash": name_hash,
-            "fileLink": file_link,
+            "name": name,
+            "fileLink": encrypted_file_link,
             "createdAt": datetime.utcnow().isoformat()
         }
 
