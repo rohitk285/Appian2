@@ -202,7 +202,7 @@ const RetrievalPageDoc = () => {
             ))
           ) : (
             <Typography variant="body1" sx={{ color: "#000000" }}>
-              No results found. Please select a document and type a name.
+              No results found.
             </Typography>
           )}
         </Box>
